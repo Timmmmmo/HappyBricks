@@ -7,9 +7,9 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;touch-action:none}
-body{background:linear-gradient(180deg,#FFE0B2 0%,#FFCC80 50%,#FFB74D 100%);font-family:-apple-system,'Segoe UI',sans-serif;display:flex;justify-content:center;align-items:center;user-select:none;-webkit-user-select:none}
+body{background:linear-gradient(180deg,#78909C 0%,#546E7A 50%,#455A64 100%);font-family:-apple-system,'Segoe UI',sans-serif;display:flex;justify-content:center;align-items:center;user-select:none;-webkit-user-select:none}
 
-#game-container{position:relative;width:100%;max-width:400px;height:100%;max-height:750px;display:flex;flex-direction:column;background:linear-gradient(180deg,#81D4FA 0%,#B3E5FC 30%,#E1F5FE 100%);overflow:hidden;box-shadow:0 0 60px rgba(255,160,0,0.3)}
+#game-container{position:relative;width:100%;max-width:400px;height:100%;max-height:750px;display:flex;flex-direction:column;background:linear-gradient(180deg,#90A4AE 0%,#B0BEC5 40%,#CFD8DC 100%);overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,0.4)}
 
 #header{flex:0 0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;background:linear-gradient(180deg,rgba(255,255,255,0.95),rgba(255,255,255,0.85));backdrop-filter:blur(10px);z-index:10;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
 #header .info{display:flex;gap:16px}
@@ -21,7 +21,7 @@ body{background:linear-gradient(180deg,#FFE0B2 0%,#FFCC80 50%,#FFB74D 100%);font
 #canvas-wrap{flex:1 1 0;position:relative;overflow:hidden}
 #game-canvas{display:block;width:100%;height:100%}
 
-#launch-hint{position:absolute;bottom:90px;left:50%;transform:translateX(-50%);font-size:0.9em;color:#0277BD;background:rgba(255,255,255,0.92);padding:10px 20px;border-radius:25px;pointer-events:none;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,0.15);animation:pulse 2s infinite}
+#launch-hint{position:absolute;bottom:100px;left:50%;transform:translateX(-50%);font-size:0.9em;color:#37474F;background:rgba(255,255,255,0.92);padding:10px 20px;border-radius:25px;pointer-events:none;white-space:nowrap;box-shadow:0 4px 15px rgba(0,0,0,0.15);animation:pulse 2s infinite}
 @keyframes pulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.05)}}
 
 #overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(255,248,225,0.98));display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:100;padding:20px}
@@ -29,10 +29,11 @@ body{background:linear-gradient(180deg,#FFE0B2 0%,#FFCC80 50%,#FFB74D 100%);font
 
 .title{font-size:2.5em;font-weight:900;background:linear-gradient(135deg,#FF6F00,#FF8F00);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;text-shadow:none;animation:bounceIn 0.6s ease-out}
 @keyframes bounceIn{0%{transform:scale(0.5);opacity:0}50%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
-.subtitle{color:#666;margin-bottom:24px;font-size:1em}
+.subtitle{color:#666;margin-bottom:24px;font-size:1em;text-align:center}
+.subtitle em{color:#FF6F00;font-style:normal}
 
-.card{background:white;border-radius:20px;padding:18px 22px;margin:10px 0;box-shadow:0 6px 25px rgba(255,143,0,0.15);max-width:300px;width:100%;border:1px solid rgba(255,143,0,0.1)}
-.card-title{font-size:0.8em;color:#FF8F00;font-weight:800;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
+.card{background:white;border-radius:20px;padding:18px 22px;margin:10px 0;box-shadow:0 6px 25px rgba(0,0,0,0.12);max-width:300px;width:100%;border:2px solid rgba(0,0,0,0.08)}
+.card-title{font-size:0.8em;color:#546E7A;font-weight:800;margin-bottom:10px;text-transform:uppercase;letter-spacing:1px}
 .card p{font-size:0.9em;color:#444;line-height:1.8;margin:4px 0}
 
 .btn{margin-top:24px;padding:16px 48px;border:none;border-radius:30px;background:linear-gradient(135deg,#FF6F00,#FF8F00);color:white;font-size:1.2em;font-weight:800;cursor:pointer;box-shadow:0 6px 20px rgba(255,111,0,0.5);transition:transform 0.15s,box-shadow 0.15s;position:relative;overflow:hidden}
@@ -50,7 +51,6 @@ body{background:linear-gradient(180deg,#FFE0B2 0%,#FFCC80 50%,#FFB74D 100%);font
 
 #pause-btn{position:absolute;top:12px;right:12px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;cursor:pointer;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,0.15);display:none;font-size:1.2em}
 #pause-btn:active{transform:scale(0.95)}
-
 #sound-btn{position:absolute;top:12px;left:12px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.9);border:none;cursor:pointer;z-index:20;box-shadow:0 2px 10px rgba(0,0,0,0.15);display:none;font-size:1em}
 #sound-btn:active{transform:scale(0.95)}
 </style>
@@ -60,72 +60,81 @@ body{background:linear-gradient(180deg,#FFE0B2 0%,#FFCC80 50%,#FFB74D 100%);font
   <div id="header">
     <div class="info">
       <div class="stat"><span class="stat-value" id="score-val">0</span><span class="stat-label">分数</span></div>
-      <div class="stat"><span class="stat-value" id="balls-val">3</span><span class="stat-label">弹球</span></div>
+      <div class="stat"><span class="stat-value" id="balls-val">8</span><span class="stat-label">弹球</span></div>
     </div>
     <div id="level-display">第 1 关</div>
   </div>
-
   <button id="pause-btn" onclick="togglePause()">⏸</button>
   <button id="sound-btn" onclick="toggleSound()">🔊</button>
-
   <div id="canvas-wrap">
     <canvas id="game-canvas"></canvas>
-    <div id="launch-hint">👆 滑动瞄准，松开发射</div>
+    <div id="launch-hint">👆 滑动瞄准，松开发射，救出父子！</div>
   </div>
-
   <div id="overlay">
-    <div class="title">🎯 快乐消除</div>
-    <div class="subtitle">帮助父子消除所有砖块！</div>
+    <div class="title">🪨 快乐消除</div>
+    <div class="subtitle">石块困住了父子！<br>用弹球打碎石块，<em>救出他们！</em></div>
+    <div class="card">
+      <div class="card-title">🪨 故事背景</div>
+      <p>父子俩被落下的石块困住了！</p>
+      <p>用弹球<strong>打碎石块</strong>，帮助他们脱险！</p>
+    </div>
     <div class="card">
       <div class="card-title">🎮 玩法</div>
       <p>👆 <b>滑动瞄准</b> — 向上滑动确定方向</p>
-      <p>🚀 <b>松开发射</b> — 弹球消除砖块</p>
-      <p>🔢 <b>数字=次数</b> — 需要击中N次</p>
+      <p>🚀 <b>松开发射</b> — 弹球消除石块</p>
+      <p>🔢 <b>数字=次数</b> — 石块需击中N次</p>
     </div>
     <div class="card">
-      <div class="card-title">⭐ 特殊砖块</div>
-      <p>⭐ <b>金币砖</b> — 消除获得50分</p>
-      <p>💣 <b>炸弹砖</b> — 爆炸摧毁周围</p>
-      <p>✨ <b>多球砖</b> — 分裂出额外的球</p>
+      <div class="card-title">⭐ 特殊石块</div>
+      <p>⭐ <b>金币</b> — 消除得50分</p>
+      <p>💣 <b>炸弹</b> — 爆炸摧毁周围</p>
+      <p>✨ <b>多球</b> — 分裂出额外的球</p>
     </div>
-    <button class="btn" onclick="startGame()">▶ 开始游戏</button>
+    <button class="btn" onclick="startGame()">▶ 开始救援</button>
   </div>
 </div>
 
 <script>
 // ════════════════════════════════════════════════════════════
-//  快乐消除 Happy Bricks - V2.0 腾讯小游戏Top3标准版
+//  快乐消除 Happy Bricks - V3.0 Story Mode
+//  石块困住父子，打碎砖块救出他们
 // ════════════════════════════════════════════════════════════
 
 let canvas, ctx;
 let W, H;
 
 // 游戏状态
-let gameState = 'idle';
+let gameState = 'idle'; // idle, aiming, playing, rescue, win, lose
 let level = 1;
 let score = 0;
-let ballsRemaining = 3;
-let highScore = parseInt(localStorage.getItem('happyBricksHighScore') || '0');
-let bricks = [];
+let ballsRemaining = 8;
+let highScore = parseInt(localStorage.getItem('happyBricksHighScore2') || '0');
+let rocks = [];
 let balls = [];
 let particles = [];
 let floatingTexts = [];
 let clouds = [];
 let isPaused = false;
 
+// 营救动画
+let rescuePhase = 0; // 0=无 1=开始震动 2=石头下落 3=庆祝
+let rescueTimer = 0;
+let rescueRocks = []; // 下落的石头
+let rescued = false; // 是否已救出
+
 // 瞄准系统
 let aimStart = null;
 let aimAngle = -Math.PI / 2;
-let aimCurrent = null; // 当前触点位置（用于绘制）
+let aimCurrent = null;
 
 // 发射器位置
 let launcherX, launcherY;
 const LAUNCHER_R = 14;
 
-// 砖块配置
-const BRICK_COLS = 7;
-const BRICK_PADDING = 5;
-let BRICK_W, BRICK_H = 32;
+// 石块配置
+const ROCK_COLS = 7;
+const ROCK_PADDING = 5;
+let ROCK_W, ROCK_H = 36;
 
 // 球配置
 const BALL_R = 10;
@@ -134,6 +143,11 @@ const BALL_SPEED = 9;
 // 角色动画
 let charAnimTime = 0;
 let fatherBlink = 0, sonBlink = 0;
+let charState = 'trapped'; // trapped, rescued
+let charCelebrateTime = 0;
+
+// 震动
+let screenShake = 0;
 
 // ════════════════════════════════════════════════════════════
 //  音效系统 (Web Audio API)
@@ -149,7 +163,6 @@ function initAudio() {
 function playSound(type) {
   if (!soundEnabled || !audioCtx) return;
   const now = audioCtx.currentTime;
-  
   try {
     switch(type) {
       case 'launch':
@@ -177,32 +190,32 @@ function playSound(type) {
           osc.start(now); osc.stop(now + 0.15); }
         break;
       case 'win':
-        [523, 659, 784, 1047].forEach((f, i) => {
+        [523, 659, 784, 1047, 1319].forEach((f, i) => {
           const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
           osc.connect(gain); gain.connect(audioCtx.destination);
           osc.type = 'sine'; osc.frequency.setValueAtTime(f, now + i * 0.12);
           gain.gain.setValueAtTime(0, now + i * 0.12);
           gain.gain.linearRampToValueAtTime(0.15, now + i * 0.12 + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.25);
-          osc.start(now + i * 0.12); osc.stop(now + i * 0.12 + 0.25);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.3);
+          osc.start(now + i * 0.12); osc.stop(now + i * 0.12 + 0.3);
         });
         break;
       case 'lose':
         { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
           osc.connect(gain); gain.connect(audioCtx.destination);
           osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now);
-          osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
-          gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
-          osc.start(now); osc.stop(now + 0.3); }
+          osc.frequency.exponentialRampToValueAtTime(80, now + 0.4);
+          gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+          osc.start(now); osc.stop(now + 0.4); }
         break;
       case 'bomb':
-        { for(let i = 0; i < 3; i++) {
+        { for(let i = 0; i < 4; i++) {
           const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
           osc.connect(gain); gain.connect(audioCtx.destination);
-          osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200 - i * 50, now + i * 0.05);
-          osc.frequency.exponentialRampToValueAtTime(30, now + i * 0.05 + 0.2);
-          gain.gain.setValueAtTime(0.2, now + i * 0.05); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.05 + 0.2);
-          osc.start(now + i * 0.05); osc.stop(now + i * 0.05 + 0.2); } }
+          osc.type = 'sawtooth'; osc.frequency.setValueAtTime(200 - i * 40, now + i * 0.06);
+          osc.frequency.exponentialRampToValueAtTime(30, now + i * 0.06 + 0.2);
+          gain.gain.setValueAtTime(0.2, now + i * 0.06); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.2);
+          osc.start(now + i * 0.06); osc.stop(now + i * 0.06 + 0.2); } }
         break;
       case 'multi':
         { [800, 1000, 1200].forEach((f, i) => {
@@ -211,6 +224,34 @@ function playSound(type) {
           osc.type = 'sine'; osc.frequency.setValueAtTime(f, now + i * 0.06);
           gain.gain.setValueAtTime(0.12, now + i * 0.06); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.06 + 0.1);
           osc.start(now + i * 0.06); osc.stop(now + i * 0.06 + 0.1); }); }
+        break;
+      case 'rescue':
+        { // 大地震动+欢呼
+          for(let i = 0; i < 6; i++) {
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'square'; osc.frequency.setValueAtTime(80 + i * 20, now + i * 0.08);
+            gain.gain.setValueAtTime(0.15, now + i * 0.08); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.1);
+            osc.start(now + i * 0.08); osc.stop(now + i * 0.08 + 0.1);
+          }
+          // 欢呼和声
+          [523, 659, 784].forEach((f, i) => {
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(f, now + 0.5 + i * 0.05);
+            gain.gain.setValueAtTime(0, now + 0.5 + i * 0.05);
+            gain.gain.linearRampToValueAtTime(0.12, now + 0.5 + i * 0.05 + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+            osc.start(now + 0.5 + i * 0.05); osc.stop(now + 1.5);
+          }); }
+        break;
+      case 'shake':
+        { const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+          osc.connect(gain); gain.connect(audioCtx.destination);
+          osc.type = 'square'; osc.frequency.setValueAtTime(60, now);
+          osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+          gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.start(now); osc.stop(now + 0.15); }
         break;
     }
   } catch(e) {}
@@ -228,25 +269,18 @@ function toggleSound() {
 function init() {
   canvas = document.getElementById('game-canvas');
   ctx = canvas.getContext('2d');
-  
   resize();
   window.addEventListener('resize', resize);
-  
-  canvas.addEventListener('pointerdown', onPointerDown);
-  canvas.addEventListener('pointermove', onPointerMove);
-  canvas.addEventListener('pointerup', onPointerUp);
-  canvas.addEventListener('pointercancel', onPointerUp);
-  
-  // 初始化云朵
-  for (let i = 0; i < 5; i++) {
-    clouds.push({
-      x: Math.random() * W,
-      y: 30 + Math.random() * 60,
-      size: 20 + Math.random() * 15,
-      speed: 0.2 + Math.random() * 0.3
-    });
+
+  canvas.addEventListener('pointerdown', onPointerDown, { passive: false });
+  canvas.addEventListener('pointermove', onPointerMove, { passive: false });
+  canvas.addEventListener('pointerup', onPointerUp, { passive: false });
+  canvas.addEventListener('pointercancel', onPointerUp, { passive: false });
+
+  for (let i = 0; i < 6; i++) {
+    clouds.push({ x: Math.random() * W, y: 25 + Math.random() * 50, size: 18 + Math.random() * 12, speed: 0.15 + Math.random() * 0.2 });
   }
-  
+
   requestAnimationFrame(gameLoop);
 }
 
@@ -256,8 +290,7 @@ function resize() {
   H = wrap.clientHeight;
   canvas.width = W;
   canvas.height = H;
-  
-  BRICK_W = (W - BRICK_PADDING * (BRICK_COLS + 1)) / BRICK_COLS;
+  ROCK_W = (W - ROCK_PADDING * (ROCK_COLS + 1)) / ROCK_COLS;
   launcherX = W / 2;
   launcherY = H - 50;
 }
@@ -274,73 +307,78 @@ function startGame() {
   gameState = 'aiming';
   level = 1;
   score = 0;
-  ballsRemaining = 8; // 第一关给8颗弹球
+  ballsRemaining = 8;
+  charState = 'trapped';
+  rescued = false;
+  rescuePhase = 0;
+  rescueRocks = [];
+  charCelebrateTime = 0;
   loadLevel(level);
 }
 
 function loadLevel(lvl) {
-  bricks = [];
+  rocks = [];
   balls = [];
   particles = [];
   floatingTexts = [];
   isPaused = false;
-  
-  const rows = Math.min(4 + Math.floor(lvl / 2), 8);
+  rescuePhase = 0;
+  rescueRocks = [];
+  charCelebrateTime = 0;
+
+  const rows = Math.min(3 + Math.floor(lvl / 2), 7);
   const minHit = Math.min(1 + Math.floor(lvl / 2), 5);
-  const maxHit = Math.min(3 + lvl * 2, 15);
-  
-  const startY = 100;
-  
-  // 固定关卡布局设计
+  const maxHit = Math.min(3 + lvl * 2, 12);
+
+  // 石块从顶部开始，几乎覆盖整个画布顶部
+  const startY = 10;
+
+  // 固定关卡图案
   const patterns = [
-    // Level 1 - 简单横排
-    null,
-    // Level 2 - V形
-    [[1,0,0,0,0,0,1],[0,1,0,0,0,1,0],[0,0,1,0,1,0,0],[0,0,0,1,0,0,0]],
-    // Level 3 - 金字塔
-    [[0,0,0,1,0,0,0],[0,0,1,1,1,0,0],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1]],
-    // Level 4 - 心形
-    [[0,1,0,0,0,1,0],[1,1,1,0,1,1,1],[1,1,1,1,1,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0]],
+    // Level 1 - 密集覆盖
+    [[1,1,1,1,1,1,1],[1,1,1,1,1,1,1],[1,1,1,1,1,1,1],[1,1,1,1,1,1,1]],
+    // Level 2 - 稀疏一些
+    [[1,1,1,1,1,1,1],[1,1,1,1,1,1,1],[0,1,1,1,1,1,0],[0,0,1,1,1,0,0]],
+    // Level 3 - 倒三角
+    [[0,0,1,1,1,0,0],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1],[1,1,1,1,1,1,1]],
+    // Level 4 - 石墙
+    [[1,0,1,0,1,0,1],[0,1,1,1,1,1,0],[1,1,1,1,1,1,1],[1,1,0,1,0,1,1]],
+    // Level 5+ - 随机
+    null
   ];
-  
+
   const pattern = lvl <= patterns.length - 1 ? patterns[lvl] : null;
-  
+
   if (pattern && lvl <= 4) {
-    // 使用固定图案
     for (let row = 0; row < pattern.length; row++) {
-      for (let col = 0; col < BRICK_COLS; col++) {
+      for (let col = 0; col < ROCK_COLS; col++) {
         if (!pattern[row][col]) continue;
-        const x = BRICK_PADDING + col * (BRICK_W + BRICK_PADDING);
-        const y = startY + row * (BRICK_H + BRICK_PADDING);
+        const x = ROCK_PADDING + col * (ROCK_W + ROCK_PADDING);
+        const y = startY + row * (ROCK_H + ROCK_PADDING);
         const hits = minHit + Math.floor(Math.random() * Math.min(2, maxHit - minHit));
-        
         let special = null;
-        if (lvl >= 2 && Math.random() < 0.12) {
+        if (lvl >= 2 && Math.random() < 0.1) {
           special = ['gold', 'bomb', 'multi'][Math.floor(Math.random() * 3)];
         }
-        
-        bricks.push({ x, y, w: BRICK_W, h: BRICK_H, hits, maxHits: hits, special, shake: 0 });
+        rocks.push({ x, y, w: ROCK_W, h: ROCK_H, hits, maxHits: hits, special, shake: 0 });
       }
     }
   } else {
-    // 随机生成
     for (let row = 0; row < rows; row++) {
-      for (let col = 0; col < BRICK_COLS; col++) {
-        if (Math.random() < 0.08) continue;
-        const x = BRICK_PADDING + col * (BRICK_W + BRICK_PADDING);
-        const y = startY + row * (BRICK_H + BRICK_PADDING);
+      for (let col = 0; col < ROCK_COLS; col++) {
+        if (Math.random() < 0.06) continue;
+        const x = ROCK_PADDING + col * (ROCK_W + ROCK_PADDING);
+        const y = startY + row * (ROCK_H + ROCK_PADDING);
         const hits = minHit + Math.floor(Math.random() * (maxHit - minHit + 1));
-        
         let special = null;
-        if (Math.random() < 0.12) {
+        if (Math.random() < 0.1) {
           special = ['gold', 'bomb', 'multi'][Math.floor(Math.random() * 3)];
         }
-        
-        bricks.push({ x, y, w: BRICK_W, h: BRICK_H, hits, maxHits: hits, special, shake: 0 });
+        rocks.push({ x, y, w: ROCK_W, h: ROCK_H, hits, maxHits: hits, special, shake: 0 });
       }
     }
   }
-  
+
   document.getElementById('level-display').textContent = `第 ${lvl} 关`;
   updateUI();
   gameState = 'aiming';
@@ -365,12 +403,7 @@ function onPointerDown(e) {
   if (gameState !== 'aiming' || isPaused) return;
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
-  const scaleX = W / rect.width;
-  const scaleY = H / rect.height;
-  aimStart = {
-    x: (e.clientX - rect.left) * scaleX,
-    y: (e.clientY - rect.top) * scaleY
-  };
+  aimStart = { x: (e.clientX - rect.left) * W / rect.width, y: (e.clientY - rect.top) * H / rect.height };
   aimCurrent = { x: aimStart.x, y: aimStart.y };
   document.getElementById('launch-hint').style.opacity = '0';
 }
@@ -379,21 +412,12 @@ function onPointerMove(e) {
   if (!aimStart || gameState !== 'aiming' || isPaused) return;
   e.preventDefault();
   const rect = canvas.getBoundingClientRect();
-  const scaleX = W / rect.width;
-  const scaleY = H / rect.height;
-  const cx = (e.clientX - rect.left) * scaleX;
-  const cy = (e.clientY - rect.top) * scaleY;
+  const cx = (e.clientX - rect.left) * W / rect.width;
+  const cy = (e.clientY - rect.top) * H / rect.height;
   aimCurrent = { x: cx, y: cy };
-
-  // 手势方向：从按下点到当前点的方向即为发射方向
-  const dx = cx - aimStart.x;
-  const dy = cy - aimStart.y;
-  const dist = Math.hypot(dx, dy);
-  if (dist < 8) return; // 移动太小不更新
-
-  // 直接用手势方向作为发射方向（不取反）
+  const dx = cx - aimStart.x, dy = cy - aimStart.y;
+  if (Math.hypot(dx, dy) < 8) return;
   aimAngle = Math.atan2(dy, dx);
-  // 限制只能向上发射（-150° ~ -30°）
   if (aimAngle > -Math.PI / 6) aimAngle = -Math.PI / 6;
   if (aimAngle < -Math.PI + Math.PI / 6) aimAngle = -Math.PI + Math.PI / 6;
 }
@@ -401,18 +425,13 @@ function onPointerMove(e) {
 function onPointerUp(e) {
   if (!aimStart || gameState !== 'aiming' || isPaused) return;
   e.preventDefault();
-  aimStart = null;
-  aimCurrent = null;
+  aimStart = null; aimCurrent = null;
   launchBall();
 }
 
 function launchBall() {
   if (ballsRemaining <= 0) return;
-  
-  const vx = Math.cos(aimAngle) * BALL_SPEED;
-  const vy = Math.sin(aimAngle) * BALL_SPEED;
-  
-  balls.push({ x: launcherX, y: launcherY, vx, vy, trail: [] });
+  balls.push({ x: launcherX, y: launcherY, vx: Math.cos(aimAngle) * BALL_SPEED, vy: Math.sin(aimAngle) * BALL_SPEED, trail: [] });
   ballsRemaining--;
   updateUI();
   gameState = 'playing';
@@ -425,75 +444,108 @@ function launchBall() {
 
 function update(dt) {
   if (gameState === 'idle' || gameState === 'aiming' || isPaused) return;
-  
+
   charAnimTime += dt;
-  
-  // 角色眨眼
-  if (Math.random() < 0.003) fatherBlink = 8;
-  if (Math.random() < 0.004) sonBlink = 6;
+  if (Math.random() < 0.002) fatherBlink = 8;
+  if (Math.random() < 0.003) sonBlink = 6;
   if (fatherBlink > 0) fatherBlink--;
   if (sonBlink > 0) sonBlink--;
-  
-  // 云朵移动
+
   clouds.forEach(c => { c.x += c.speed; if (c.x > W + 30) c.x = -30; });
-  
+  if (screenShake > 0) screenShake *= 0.9;
+
+  // 营救动画处理
+  if (rescuePhase > 0) {
+    rescueTimer += dt;
+    if (rescuePhase === 1) {
+      // 震动阶段 - 屏幕和角色都在抖
+      if (rescueTimer % 8 < 4) screenShake = 6;
+      if (Math.random() < 0.05) playSound('shake');
+      if (rescueTimer > 90) {
+        rescuePhase = 2;
+        rescueTimer = 0;
+        // 准备落下的石头
+        rocks.forEach(r => {
+          rescueRocks.push({ x: r.x, y: r.y, w: r.w, h: r.h, vy: 0, rotation: (Math.random() - 0.5) * 0.3, rot: 0, color: getRockColor(r) });
+        });
+        playSound('rescue');
+      }
+    } else if (rescuePhase === 2) {
+      // 石块下落阶段
+      rescueRocks.forEach(r => {
+        r.vy += 0.8;
+        r.y += r.vy;
+        r.rot += r.rotation;
+        if (r.y > H + 50) r.y = H + 100; // 移出屏幕
+      });
+      if (rescueTimer > 180) {
+        rescuePhase = 3;
+        rescueTimer = 0;
+        charState = 'rescued';
+      }
+    } else if (rescuePhase === 3) {
+      // 庆祝阶段
+      charCelebrateTime += dt;
+      if (charCelebrateTime > 120) {
+        // 完成，弹出结果
+        gameState = 'win';
+        if (score > highScore) { highScore = score; localStorage.setItem('happyBricksHighScore2', highScore); }
+        showResult(true);
+      }
+    }
+    return; // 营救动画时不让球移动
+  }
+
   // 更新球
   for (let i = balls.length - 1; i >= 0; i--) {
     const ball = balls[i];
     ball.trail.push({ x: ball.x, y: ball.y });
     if (ball.trail.length > 10) ball.trail.shift();
-    
     ball.x += ball.vx;
     ball.y += ball.vy;
-    
+
     if (ball.x < BALL_R) { ball.x = BALL_R; ball.vx = -ball.vx; }
     if (ball.x > W - BALL_R) { ball.x = W - BALL_R; ball.vx = -ball.vx; }
     if (ball.y < BALL_R) { ball.y = BALL_R; ball.vy = -ball.vy; }
-    
+
     if (ball.y > H + BALL_R) { balls.splice(i, 1); continue; }
-    
-    // 砖块碰撞
-    for (let j = bricks.length - 1; j >= 0; j--) {
-      const brick = bricks[j];
-      if (checkCollision(ball, brick)) {
-        brick.hits--;
-        brick.shake = 6;
+
+    // 岩石碰撞
+    for (let j = rocks.length - 1; j >= 0; j--) {
+      const rock = rocks[j];
+      if (checkCollision(ball, rock)) {
+        rock.hits--;
+        rock.shake = 6;
         playSound('hit');
-        spawnHitParticles(ball.x, ball.y, getBrickColor(brick));
-        
-        if (brick.hits <= 0) {
-          const points = brick.special ? {gold:50, bomb:20, multi:30}[brick.special] : 10;
+        spawnHitParticles(ball.x, ball.y, getRockColor(rock));
+
+        if (rock.hits <= 0) {
+          const points = rock.special ? { gold: 50, bomb: 20, multi: 30 }[rock.special] : 10;
           score += points;
-          spawnDestroyParticles(brick.x + brick.w/2, brick.y + brick.h/2, getBrickColor(brick));
-          addFloatingText(brick.x + brick.w/2, brick.y, '+' + points);
-          
-          if (brick.special === 'bomb') { playSound('bomb'); explodeNearby(brick.x + brick.w/2, brick.y + brick.h/2); }
-          else if (brick.special === 'multi') { playSound('multi'); splitBall(ball); }
+          spawnDestroyParticles(rock.x + rock.w / 2, rock.y + rock.h / 2, getRockColor(rock));
+          addFloatingText(rock.x + rock.w / 2, rock.y, '+' + points);
+          if (rock.special === 'bomb') { playSound('bomb'); explodeNearby(rock.x + rock.w / 2, rock.y + rock.h / 2); }
+          else if (rock.special === 'multi') { playSound('multi'); splitBall(ball); }
           else { playSound('destroy'); }
-          
-          bricks.splice(j, 1);
+          rocks.splice(j, 1);
           updateUI();
         }
       }
     }
   }
-  
-  bricks.forEach(b => { if (b.shake > 0) b.shake *= 0.85; });
-  
-  particles = particles.filter(p => {
-    p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 0.025;
-    return p.life > 0;
-  });
-  
+
+  rocks.forEach(r => { if (r.shake > 0) r.shake *= 0.85; });
+
+  particles = particles.filter(p => { p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 0.025; return p.life > 0; });
   floatingTexts = floatingTexts.filter(t => { t.y -= 1.2; t.life -= 0.018; return t.life > 0; });
-  
+
   // 检查游戏状态
   if (balls.length === 0) {
-    if (bricks.length === 0) {
-      gameState = 'win';
-      playSound('win');
-      if (score > highScore) { highScore = score; localStorage.setItem('happyBricksHighScore', highScore); }
-      showResult(true);
+    if (rocks.length === 0 && rescuePhase === 0) {
+      // 所有石头打完了！开始营救动画
+      rescuePhase = 1;
+      rescueTimer = 0;
+      gameState = 'rescue';
     } else if (ballsRemaining <= 0) {
       gameState = 'lose';
       playSound('lose');
@@ -506,11 +558,10 @@ function update(dt) {
   }
 }
 
-function checkCollision(ball, brick) {
-  const cx = Math.max(brick.x, Math.min(ball.x, brick.x + brick.w));
-  const cy = Math.max(brick.y, Math.min(ball.y, brick.y + brick.h));
+function checkCollision(ball, rock) {
+  const cx = Math.max(rock.x, Math.min(ball.x, rock.x + rock.w));
+  const cy = Math.max(rock.y, Math.min(ball.y, rock.y + rock.h));
   const dx = ball.x - cx, dy = ball.y - cy;
-  
   if (dx * dx + dy * dy < BALL_R * BALL_R) {
     if (Math.abs(dx) > Math.abs(dy)) ball.vx = -ball.vx;
     else ball.vy = -ball.vy;
@@ -519,10 +570,11 @@ function checkCollision(ball, brick) {
   return false;
 }
 
-function getBrickColor(brick) {
-  if (brick.special) return {gold:'#FFD700', bomb:'#F44336', multi:'#9C27B0'}[brick.special];
-  const colors = ['#81C784','#66BB6A','#4CAF50','#43A047','#388E3C','#2E7D32','#FFB74D','#FFA726','#FF9800','#FB8C00','#F57C00','#EF6C00','#E65100','#FF5722','#D84315'];
-  return colors[Math.min(brick.hits - 1, colors.length - 1)];
+function getRockColor(rock) {
+  if (rock.special) return { gold: '#FFD700', bomb: '#F44336', multi: '#9C27B0' }[rock.special];
+  const t = rock.maxHits - rock.hits;
+  const colors = ['#90A4AE', '#78909C', '#607D8B', '#546E7A', '#455A64', '#37474F', '#B0BEC5', '#CFD8DC', '#ECEFF1', '#8D6E63', '#795548', '#6D4C41'];
+  return colors[Math.min(t, colors.length - 1)];
 }
 
 function splitBall(orig) {
@@ -534,14 +586,11 @@ function splitBall(orig) {
 
 function explodeNearby(x, y) {
   const RADIUS = 90;
-  bricks.forEach(b => {
-    const dist = Math.hypot(b.x + b.w/2 - x, b.y + b.h/2 - y);
-    if (dist < RADIUS) {
-      b.hits -= 3;
-      spawnDestroyParticles(b.x + b.w/2, b.y + b.h/2, '#FF5722');
-    }
+  rocks.forEach(r => {
+    const dist = Math.hypot(r.x + r.w / 2 - x, r.y + r.h / 2 - y);
+    if (dist < RADIUS) { r.hits -= 3; spawnDestroyParticles(r.x + r.w / 2, r.y + r.h / 2, '#795548'); }
   });
-  bricks = bricks.filter(b => b.hits > 0);
+  rocks = rocks.filter(r => r.hits > 0);
   updateUI();
 }
 
@@ -551,14 +600,14 @@ function explodeNearby(x, y) {
 
 function spawnHitParticles(x, y, color) {
   for (let i = 0; i < 6; i++) {
-    particles.push({ x, y, vx: (Math.random()-0.5)*5, vy: (Math.random()-0.5)*5-2, life: 1, color, size: 5+Math.random()*4 });
+    particles.push({ x, y, vx: (Math.random() - 0.5) * 5, vy: (Math.random() - 0.5) * 5 - 2, life: 1, color, size: 5 + Math.random() * 4 });
   }
 }
 
 function spawnDestroyParticles(x, y, color) {
   for (let i = 0; i < 16; i++) {
     const angle = (Math.PI * 2 * i) / 16;
-    particles.push({ x, y, vx: Math.cos(angle)*4, vy: Math.sin(angle)*4-2, life: 1, color, size: 7+Math.random()*5 });
+    particles.push({ x, y, vx: Math.cos(angle) * 4, vy: Math.sin(angle) * 4 - 2, life: 1, color, size: 7 + Math.random() * 5 });
   }
 }
 
@@ -574,9 +623,8 @@ function showResult(win) {
   document.getElementById('pause-btn').style.display = 'none';
   const overlay = document.getElementById('overlay');
   overlay.classList.remove('hidden');
-  
   overlay.innerHTML = `
-    <div class="result-title ${win ? 'win' : 'lose'}">${win ? '🎉 过关！' : '💪 再试一次'}</div>
+    <div class="result-title ${win ? 'win' : 'lose'}">${win ? '🎉 成功营救！' : '💪 再试一次'}</div>
     <div class="result-stats">
       <div class="result-stat"><div class="result-stat-value">${score}</div><div class="result-stat-label">分数</div></div>
       <div class="result-stat"><div class="result-stat-value">${level}</div><div class="result-stat-label">关卡</div></div>
@@ -588,14 +636,14 @@ function showResult(win) {
 
 function nextLevel() {
   level++;
-  ballsRemaining = Math.min(5, 3 + Math.floor(level / 3));
+  ballsRemaining = Math.min(8, 6 + Math.floor(level / 2));
   loadLevel(level);
   document.getElementById('overlay').classList.add('hidden');
   document.getElementById('pause-btn').style.display = 'block';
 }
 
 function retryLevel() {
-  ballsRemaining = 3;
+  ballsRemaining = 8;
   loadLevel(level);
   document.getElementById('overlay').classList.add('hidden');
   document.getElementById('pause-btn').style.display = 'block';
@@ -606,56 +654,82 @@ function retryLevel() {
 // ════════════════════════════════════════════════════════════
 
 function draw() {
-  ctx.clearRect(0, 0, W, H);
-  
-  // 背景渐变
+  // 屏幕震动偏移
+  const shakeX = screenShake > 0.5 ? (Math.random() - 0.5) * screenShake * 2 : 0;
+  const shakeY = screenShake > 0.5 ? (Math.random() - 0.5) * screenShake * 2 : 0;
+
+  ctx.save();
+  ctx.translate(shakeX, shakeY);
+
+  // 背景
   const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-  bgGrad.addColorStop(0, '#81D4FA');
-  bgGrad.addColorStop(0.4, '#B3E5FC');
-  bgGrad.addColorStop(1, '#E1F5FE');
+  bgGrad.addColorStop(0, '#90A4AE');
+  bgGrad.addColorStop(0.4, '#B0BEC5');
+  bgGrad.addColorStop(1, '#CFD8DC');
   ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
-  
-  // 云朵
+  ctx.fillRect(-10, -10, W + 20, H + 20);
+
   drawClouds();
-  
-  // 角色
+
+  // 角色（在石块下方）
   drawCharacters();
-  
-  // 砖块
-  bricks.forEach(drawBrick);
-  
+
+  // 石块（营救动画时也显示当前剩余石块）
+  if (rescuePhase < 2) rocks.forEach(drawRock);
+
+  // 下落的石头
+  rescueRocks.forEach(r => {
+    ctx.save();
+    ctx.translate(r.x + r.w / 2, r.y + r.h / 2);
+    ctx.rotate(r.rot);
+    drawRockShape(-r.w / 2, -r.h / 2, r.w, r.h, r.color, 0);
+    ctx.restore();
+  });
+
   // 发射器
   drawLauncher();
-  
-  // 瞄准线
+
   if (gameState === 'aiming' && aimStart) drawAimLine();
-  
-  // 球
+
   balls.forEach(drawBall);
-  
-  // 粒子
   particles.forEach(drawParticle);
-  
-  // 浮动文字
   floatingTexts.forEach(drawFloatingText);
-  
-  // 暂停提示
+
+  // 营救阶段文字提示
+  if (rescuePhase === 1) {
+    const alpha = 0.5 + Math.sin(charAnimTime * 0.015) * 0.5;
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#FF8F00';
+    ctx.font = 'bold 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('💥 震动！石块要落下了！', W / 2, H / 2);
+    ctx.globalAlpha = 1;
+  }
+
+  if (rescuePhase === 2) {
+    ctx.fillStyle = '#FFD700';
+    ctx.font = 'bold 20px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('🎉 父子得救了！', W / 2, H / 2);
+  }
+
   if (isPaused) {
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = '#FF6F00';
     ctx.font = 'bold 32px sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('⏸ 已暂停', W/2, H/2);
+    ctx.fillText('⏸ 已暂停', W / 2, H / 2);
     ctx.font = '16px sans-serif';
     ctx.fillStyle = '#666';
-    ctx.fillText('点击继续按钮恢复', W/2, H/2 + 30);
+    ctx.fillText('点击继续按钮恢复', W / 2, H / 2 + 30);
   }
+
+  ctx.restore();
 }
 
 function drawClouds() {
-  ctx.fillStyle = 'rgba(255,255,255,0.6)';
+  ctx.fillStyle = 'rgba(255,255,255,0.55)';
   clouds.forEach(c => {
     ctx.beginPath();
     ctx.arc(c.x, c.y, c.size, 0, Math.PI * 2);
@@ -666,117 +740,206 @@ function drawClouds() {
 }
 
 function drawCharacters() {
-  const baseY = 55;
-  const bob = Math.sin(charAnimTime * 0.004) * 2;
-  
-  // 父亲
-  drawQCharacter(W/2 - 28, baseY + bob, 24, '#FFCC80', '#F57C00', fatherBlink > 0);
-  // 儿子
-  drawQCharacter(W/2 + 22, baseY + bob + 6, 18, '#FFE0B2', '#FB8C00', sonBlink > 0);
+  // 角色位置在画布底部中央
+  const baseY = charState === 'rescued' ? H - 60 : H - 55;
+  const bob = charState === 'rescued'
+    ? Math.abs(Math.sin(charCelebrateTime * 0.02)) * 8  // 庆祝时上下跳
+    : Math.sin(charAnimTime * 0.003) * (rescuePhase === 1 ? 3 : 1.5); // 被困时轻微抖动
+  const shake = rescuePhase === 1 ? (Math.random() - 0.5) * 4 : 0;
+
+  // 背景：地面/废墟
+  if (charState === 'trapped') {
+    ctx.fillStyle = 'rgba(69,90,100,0.3)';
+    ctx.fillRect(0, H - 70, W, 70);
+    // 一些碎石装饰
+    ctx.fillStyle = 'rgba(84,110,122,0.4)';
+    [[20, H - 30, 12], [W - 35, H - 25, 10], [W/2 - 20, H - 20, 8]].forEach(([x, y, r]) => {
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+
+  // 父子
+  const isBlinking1 = fatherBlink > 0, isBlinking2 = sonBlink > 0;
+  const isWorried = charState === 'trapped';
+  const isHappy = charState === 'rescued';
+
+  drawQCharacter(W / 2 - 30 + shake, baseY + bob, 26, '#FFCC80', '#E65100', isBlinking1, isWorried, isHappy);
+  drawQCharacter(W / 2 + 22 + shake, baseY + bob + 5, 20, '#FFE0B2', '#FB8C00', isBlinking2, isWorried, isHappy);
+
+  // 营救后的光芒
+  if (charState === 'rescued') {
+    ctx.globalAlpha = 0.3 + Math.sin(charCelebrateTime * 0.03) * 0.15;
+    const grad = ctx.createRadialGradient(W / 2, baseY, 10, W / 2, baseY, 80);
+    grad.addColorStop(0, '#FFD700');
+    grad.addColorStop(1, 'rgba(255,215,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(W / 2 - 80, baseY - 80, 160, 160);
+    ctx.globalAlpha = 1;
+  }
 }
 
-function drawQCharacter(x, y, size, skinColor, hairColor, isBlinking) {
+function drawQCharacter(x, y, size, skinColor, hairColor, isBlinking, isWorried, isHappy) {
   // 身体
   ctx.fillStyle = hairColor;
   ctx.beginPath();
   ctx.arc(x, y + size * 0.3, size * 0.55, 0, Math.PI * 2);
   ctx.fill();
-  
+
   // 头
   ctx.fillStyle = skinColor;
   ctx.beginPath();
   ctx.arc(x, y - size * 0.15, size * 0.45, 0, Math.PI * 2);
   ctx.fill();
-  
+
   // 头发
   ctx.fillStyle = hairColor;
   ctx.beginPath();
   ctx.arc(x, y - size * 0.35, size * 0.35, Math.PI, 2 * Math.PI);
   ctx.fill();
-  
+
   // 眼睛
-  ctx.fillStyle = '#333';
   const eyeY = y - size * 0.12;
   if (isBlinking) {
+    ctx.fillStyle = '#333';
     ctx.fillRect(x - size * 0.2, eyeY, size * 0.12, 2);
     ctx.fillRect(x + size * 0.08, eyeY, size * 0.12, 2);
+  } else if (isWorried) {
+    // 担心的表情：眉头上扬
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x - size * 0.22, eyeY - size * 0.1); ctx.lineTo(x - size * 0.12, eyeY - size * 0.15);
+    ctx.moveTo(x + size * 0.1, eyeY - size * 0.15); ctx.lineTo(x + size * 0.2, eyeY - size * 0.1);
+    ctx.stroke();
+    ctx.fillStyle = '#333';
+    ctx.beginPath();
+    ctx.arc(x - size * 0.17, eyeY, size * 0.06, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.17, eyeY, size * 0.06, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(x - size * 0.15, eyeY - 1, size * 0.02, 0, Math.PI * 2);
+    ctx.arc(x + size * 0.19, eyeY - 1, size * 0.02, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (isHappy) {
+    // 开心的表情：眯眯眼
+    ctx.strokeStyle = '#333'; ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x - size * 0.17, eyeY, size * 0.08, 0.2 * Math.PI, 0.8 * Math.PI);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x + size * 0.17, eyeY, size * 0.08, 0.2 * Math.PI, 0.8 * Math.PI);
+    ctx.stroke();
   } else {
+    ctx.fillStyle = '#333';
     ctx.beginPath();
     ctx.arc(x - size * 0.14, eyeY, size * 0.07, 0, Math.PI * 2);
     ctx.arc(x + size * 0.14, eyeY, size * 0.07, 0, Math.PI * 2);
     ctx.fill();
-    // 眼白高光
     ctx.fillStyle = '#fff';
     ctx.beginPath();
     ctx.arc(x - size * 0.12, eyeY - size * 0.02, size * 0.025, 0, Math.PI * 2);
     ctx.arc(x + size * 0.16, eyeY - size * 0.02, size * 0.025, 0, Math.PI * 2);
     ctx.fill();
   }
-  
+
   // 嘴巴
   ctx.strokeStyle = '#333';
   ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(x, y + size * 0.1, size * 0.12, 0.1 * Math.PI, 0.9 * Math.PI);
-  ctx.stroke();
-  
+  if (isWorried) {
+    ctx.beginPath();
+    ctx.arc(x, y + size * 0.18, size * 0.1, 1.1 * Math.PI, 1.9 * Math.PI);
+    ctx.stroke();
+  } else if (isHappy) {
+    ctx.beginPath();
+    ctx.arc(x, y + size * 0.06, size * 0.15, 0.1 * Math.PI, 0.9 * Math.PI);
+    ctx.stroke();
+  } else {
+    ctx.beginPath();
+    ctx.arc(x, y + size * 0.1, size * 0.12, 0.1 * Math.PI, 0.9 * Math.PI);
+    ctx.stroke();
+  }
+
   // 腮红
-  ctx.fillStyle = 'rgba(255,150,150,0.4)';
+  ctx.fillStyle = isWorried ? 'rgba(150,150,200,0.4)' : isHappy ? 'rgba(255,150,150,0.5)' : 'rgba(255,150,150,0.4)';
   ctx.beginPath();
   ctx.ellipse(x - size * 0.28, y + size * 0.02, size * 0.1, size * 0.06, 0, 0, Math.PI * 2);
   ctx.ellipse(x + size * 0.28, y + size * 0.02, size * 0.1, size * 0.06, 0, 0, Math.PI * 2);
   ctx.fill();
 }
 
-function drawBrick(brick) {
-  const shakeX = brick.shake ? (Math.random() - 0.5) * brick.shake : 0;
-  const shakeY = brick.shake ? (Math.random() - 0.5) * brick.shake : 0;
-  const x = brick.x + shakeX, y = brick.y + shakeY;
-  const color = getBrickColor(brick);
-  
+function drawRock(rock) {
+  const sx = rock.shake ? (Math.random() - 0.5) * rock.shake : 0;
+  const sy = rock.shake ? (Math.random() - 0.5) * rock.shake : 0;
+  drawRockShape(rock.x + sx, rock.y + sy, rock.w, rock.h, getRockColor(rock), rock.shake);
+}
+
+function drawRockShape(x, y, w, h, color, shake) {
+  // 石头主体 - 稍微不规则的四边形
+  const jitter = shake > 0 ? 3 : 1;
+
   // 阴影
-  ctx.fillStyle = 'rgba(0,0,0,0.2)';
-  roundRect(ctx, x + 3, y + 3, brick.w, brick.h, 8);
+  ctx.fillStyle = 'rgba(0,0,0,0.3)';
+  ctx.beginPath();
+  ctx.moveTo(x + 3 + Math.sin(1) * jitter, y + 3);
+  ctx.lineTo(x + w - 2 + Math.cos(2) * jitter, y + 2);
+  ctx.lineTo(x + w - 1, y + h - 3 + Math.sin(3) * jitter);
+  ctx.lineTo(x + 1, y + h - 1 + Math.cos(4) * jitter);
+  ctx.closePath();
   ctx.fill();
-  
-  // 主体渐变
-  const grad = ctx.createLinearGradient(x, y, x, y + brick.h);
-  grad.addColorStop(0, lightenColor(color, 30));
-  grad.addColorStop(0.5, color);
-  grad.addColorStop(1, darkenColor(color, 20));
+
+  // 石头主体 - 灰色系
+  const grad = ctx.createLinearGradient(x, y, x, y + h);
+  grad.addColorStop(0, lightenColor(color, 20));
+  grad.addColorStop(0.4, color);
+  grad.addColorStop(1, darkenColor(color, 30));
   ctx.fillStyle = grad;
-  roundRect(ctx, x, y, brick.w, brick.h, 8);
+  ctx.beginPath();
+  ctx.moveTo(x + Math.sin(0) * jitter, y);
+  ctx.lineTo(x + w + Math.cos(1) * jitter, y);
+  ctx.lineTo(x + w, y + h + Math.sin(2) * jitter);
+  ctx.lineTo(x + Math.cos(3) * jitter, y + h);
+  ctx.closePath();
   ctx.fill();
-  
+
+  // 石头纹理线条
+  ctx.strokeStyle = darkenColor(color, 20);
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(x + w * 0.2, y + h * 0.3);
+  ctx.lineTo(x + w * 0.6, y + h * 0.6);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(x + w * 0.5, y + h * 0.1);
+  ctx.lineTo(x + w * 0.3, y + h * 0.5);
+  ctx.stroke();
+
   // 高光
-  ctx.fillStyle = 'rgba(255,255,255,0.4)';
-  roundRect(ctx, x + 3, y + 2, brick.w - 6, brick.h * 0.35, 5);
+  ctx.fillStyle = 'rgba(255,255,255,0.25)';
+  ctx.beginPath();
+  ctx.moveTo(x + 2, y + 2);
+  ctx.lineTo(x + w * 0.7, y + 2);
+  ctx.lineTo(x + w * 0.5, y + h * 0.3);
+  ctx.lineTo(x + 2, y + h * 0.3);
+  ctx.closePath();
   ctx.fill();
-  
+
   // 数字
-  ctx.fillStyle = '#fff';
-  ctx.font = `bold ${Math.min(16, brick.h * 0.5)}px sans-serif`;
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = `bold ${Math.min(16, h * 0.45)}px sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.shadowBlur = 2; ctx.shadowColor = 'rgba(0,0,0,0.5)';
-  ctx.fillText(brick.hits, x + brick.w / 2, y + brick.h / 2);
+  const rock = rocks.find(r => r.x === x - (shake ? (Math.random() - 0.5) * shake : 0) && r.y === y - (shake ? (Math.random() - 0.5) * shake : 0));
+  if (rock) ctx.fillText(rock.hits, x + w / 2, y + h / 2);
   ctx.shadowBlur = 0;
-  
-  // 特殊标记
-  if (brick.special) {
-    ctx.font = '12px sans-serif';
-    ctx.fillText({gold:'⭐', bomb:'💣', multi:'✨'}[brick.special], x + brick.w / 2, y + brick.h / 2 + 11);
-  }
 }
 
 function drawLauncher() {
-  // 发射台阴影
   ctx.fillStyle = 'rgba(0,0,0,0.15)';
   ctx.beginPath();
   ctx.ellipse(launcherX, launcherY + 8, LAUNCHER_R + 8, 6, 0, 0, Math.PI * 2);
   ctx.fill();
-  
-  // 发射台
+
   const grad = ctx.createRadialGradient(launcherX - 4, launcherY - 4, 0, launcherX, launcherY, LAUNCHER_R + 6);
   grad.addColorStop(0, '#FFB74D');
   grad.addColorStop(0.7, '#FF9800');
@@ -785,14 +948,12 @@ function drawLauncher() {
   ctx.beginPath();
   ctx.arc(launcherX, launcherY, LAUNCHER_R + 5, 0, Math.PI * 2);
   ctx.fill();
-  
-  // 发射器中心
+
   ctx.fillStyle = '#FFF3E0';
   ctx.beginPath();
   ctx.arc(launcherX, launcherY, LAUNCHER_R, 0, Math.PI * 2);
   ctx.fill();
-  
-  // 高光
+
   ctx.fillStyle = 'rgba(255,255,255,0.6)';
   ctx.beginPath();
   ctx.arc(launcherX - 4, launcherY - 4, LAUNCHER_R * 0.4, 0, Math.PI * 2);
@@ -804,7 +965,6 @@ function drawAimLine() {
   const ex = launcherX + Math.cos(aimAngle) * len;
   const ey = launcherY + Math.sin(aimAngle) * len;
 
-  // 预测轨迹（多段虚线）
   ctx.strokeStyle = 'rgba(255,255,255,0.85)';
   ctx.lineWidth = 3;
   ctx.setLineDash([10, 7]);
@@ -814,7 +974,6 @@ function drawAimLine() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  // 箭头圆点
   ctx.fillStyle = '#FF6F00';
   ctx.shadowBlur = 8;
   ctx.shadowColor = 'rgba(255,111,0,0.6)';
@@ -823,7 +982,6 @@ function drawAimLine() {
   ctx.fill();
   ctx.shadowBlur = 0;
 
-  // 手势起点指示圆
   if (aimCurrent) {
     ctx.strokeStyle = 'rgba(255,200,100,0.5)';
     ctx.lineWidth = 2;
@@ -836,7 +994,6 @@ function drawAimLine() {
 }
 
 function drawBall(ball) {
-  // 轨迹
   ball.trail.forEach((p, i) => {
     const alpha = i / ball.trail.length * 0.4;
     const r = BALL_R * (i / ball.trail.length) * 0.8;
@@ -845,13 +1002,12 @@ function drawBall(ball) {
     ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
     ctx.fill();
   });
-  
-  // 球体渐变
+
   const grad = ctx.createRadialGradient(ball.x - 3, ball.y - 3, 0, ball.x, ball.y, BALL_R);
   grad.addColorStop(0, '#FFF8E1');
   grad.addColorStop(0.5, '#FFE082');
   grad.addColorStop(1, '#FFB74D');
-  
+
   ctx.fillStyle = grad;
   ctx.shadowBlur = 10;
   ctx.shadowColor = 'rgba(255,160,0,0.4)';
@@ -859,8 +1015,7 @@ function drawBall(ball) {
   ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
   ctx.fill();
   ctx.shadowBlur = 0;
-  
-  // 高光
+
   ctx.fillStyle = 'rgba(255,255,255,0.7)';
   ctx.beginPath();
   ctx.arc(ball.x - 3, ball.y - 3, BALL_R * 0.3, 0, Math.PI * 2);
@@ -887,26 +1042,12 @@ function drawFloatingText(t) {
   ctx.globalAlpha = 1;
 }
 
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-  ctx.lineTo(x + r, y + h);
-  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-
 function lightenColor(color, percent) {
   const num = parseInt(color.replace('#', ''), 16);
   const amt = Math.round(2.55 * percent);
   const R = Math.min(255, (num >> 16) + amt);
-  const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
-  const B = Math.min(255, (num & 0x0000FF) + amt);
+  const G = Math.min(255, ((num >> 8) & 0xFF) + amt);
+  const B = Math.min(255, (num & 0xFF) + amt);
   return `rgb(${R},${G},${B})`;
 }
 
@@ -914,8 +1055,8 @@ function darkenColor(color, percent) {
   const num = parseInt(color.replace('#', ''), 16);
   const amt = Math.round(2.55 * percent);
   const R = Math.max(0, (num >> 16) - amt);
-  const G = Math.max(0, ((num >> 8) & 0x00FF) - amt);
-  const B = Math.max(0, (num & 0x0000FF) - amt);
+  const G = Math.max(0, ((num >> 8) & 0xFF) - amt);
+  const B = Math.max(0, (num & 0xFF) - amt);
   return `rgb(${R},${G},${B})`;
 }
 
