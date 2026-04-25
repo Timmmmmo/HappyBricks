@@ -127,9 +127,17 @@ let level = 1;
 let score = 0;
 let ballsRemaining = 10;
 let timeRemaining = 60;
-let highScore = parseInt(localStorage.getItem('happyBricksHighScore4') || '0');
+let highScore = parseInt(localStorage.getItem('happyBricksHighScore5') || '0');
+// 连击系统
+let comboCount = 0;
+let comboTimer = 0;
+let comboMultiplier = 1;
+const COMBO_WINDOW = 1500;
 let rocks = [];
-let balls = [];
+let ballPool = [];
+let particlePool = [];
+let activeBalls = [];
+let activeParticles = [];
 let particles = [];
 let floatingTexts = [];
 let isPaused = false;
@@ -682,12 +690,44 @@ function update(dt) {
 }
 
 function checkCollision(ball, rock) {
+  // 精确向量反射: 找到最近点
   const cx = Math.max(rock.x, Math.min(ball.x, rock.x + rock.w));
   const cy = Math.max(rock.y, Math.min(ball.y, rock.y + rock.h));
-  const dx = ball.x - cx, dy = ball.y - cy;
-  if (dx * dx + dy * dy < BALL_R * BALL_R) {
-    if (Math.abs(dx) > Math.abs(dy)) ball.vx = -ball.vx;
-    else ball.vy = -ball.vy;
+  const dx = ball.x - cx;
+  const dy = ball.y - cy;
+  const distSq = dx * dx + dy * dy;
+  const radSq = BALL_R * BALL_R;
+  
+  if (distSq < radSq) {
+    // 计算碰撞法向量（角落情况特殊处理）
+    const dist = Math.sqrt(distSq) || 0.001;
+    let nx = dx / dist;
+    let ny = dy / dist;
+    
+    // 如果在砖块内部，检测从哪边进入
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) {
+      // 角落碰撞 - 使用更精确的判断
+      const overlapX = Math.min(ball.x - rock.x, rock.x + rock.w - ball.x);
+      const overlapY = Math.min(ball.y - rock.y, rock.y + rock.h - ball.y);
+      if (overlapX < overlapY) {
+        nx = ball.x < rock.x + rock.w / 2 ? -1 : 1;
+        ny = 0;
+      } else {
+        nx = 0;
+        ny = ball.y < rock.y + rock.h / 2 ? -1 : 1;
+      }
+    }
+    
+    // 向量反射: v' = v - 2(v·n)n
+    const dot = ball.vx * nx + ball.vy * ny;
+    ball.vx = ball.vx - 2 * dot * nx;
+    ball.vy = ball.vy - 2 * dot * ny;
+    
+    // 推出重叠区域防止粘连
+    const overlap = BALL_R - dist;
+    ball.x += nx * (overlap + 0.5);
+    ball.y += ny * (overlap + 0.5);
+    
     return true;
   }
   return false;
