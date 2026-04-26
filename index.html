@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>快乐消除 Happy Bricks - 救援行动</title>
+<title>快乐消除 Happy Bricks - V6.0 连锁营救</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;touch-action:none}
@@ -61,6 +61,15 @@ body{background:linear-gradient(180deg,#5D4037 0%,#4E342E 50%,#3E2723 100%);font
 #sound-btn{position:absolute;top:8px;left:8px;width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.15);border:1px solid rgba(255,204,128,0.3);cursor:pointer;z-index:20;font-size:0.9em;color:#FFCC80;display:none}
 #sound-btn:active{transform:scale(0.95)}
 
+/* 连锁爆炸波纹 */
+@keyframes chain-wave{0%{transform:scale(0.5);opacity:1}100%{transform:scale(2.5);opacity:0}}
+.chain-wave{position:absolute;border-radius:50%;border:3px solid #FFD700;animation:chain-wave 0.4s ease-out forwards;pointer-events:none}
+
+/* 连锁文字 */
+#chain-display{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:2.5em;font-weight:900;color:#FFD700;text-shadow:0 0 20px rgba(255,215,0,0.8),0 0 40px rgba(255,111,0,0.5);pointer-events:none;z-index:50;opacity:0;transition:opacity 0.2s}
+#chain-display.show{opacity:1;animation:chainPop 0.6s ease-out}
+@keyframes chainPop{0%{transform:translate(-50%,-50%) scale(0.5)}40%{transform:translate(-50%,-50%) scale(1.2)}100%{transform:translate(-50%,-50%) scale(1);opacity:0}}
+
 /* 紧急状态动画 */
 @keyframes danger-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,34,0.4)}50%{box-shadow:0 0 0 8px rgba(255,87,34,0)}}
 .danger-mode{animation:danger-pulse 1s infinite}
@@ -85,6 +94,7 @@ body{background:linear-gradient(180deg,#5D4037 0%,#4E342E 50%,#3E2723 100%);font
   <button id="sound-btn" onclick="toggleSound()">🔊</button>
   <div id="canvas-wrap">
     <canvas id="game-canvas"></canvas>
+    <div id="chain-display"></div>
     <div id="launch-hint">👆 滑动瞄准，快速清除石块！</div>
   </div>
   <div id="overlay">
@@ -115,8 +125,8 @@ body{background:linear-gradient(180deg,#5D4037 0%,#4E342E 50%,#3E2723 100%);font
 
 <script>
 // ════════════════════════════════════════════════════════════
-//  快乐消除 Happy Bricks - V4.0 四面围困救援模式
-//  石块四面围困父子，持续压力，快速营救
+//  快乐消除 Happy Bricks - V6.0 连锁坍塌系统
+//  物理连锁营救模式
 // ════════════════════════════════════════════════════════════
 
 let canvas, ctx;
@@ -148,6 +158,15 @@ function getParticle() {
 function recycleParticle(p) {
   if (particlePool.length < MAX_PARTICLES) particlePool.push(p);
 }
+
+// 连锁坍塌系统
+let chainQueue = []; // 待处理的连锁石块队列
+let chainDepth = 0; // 当前连锁深度
+let chainPending = 0; // 待处理连锁数
+let isChaining = false; // 连锁动画中
+const CHAIN_SPREAD_DELAY = 80; // 连锁传播延迟(ms)
+const CHAIN_RADIUS = 65; // 连锁传播半径（像素）
+let chainWaves = []; // 连锁波纹特效
 
 let floatingTexts = [];
 let isPaused = false;
@@ -276,6 +295,49 @@ function playSound(type) {
           gain.gain.setValueAtTime(0.1, now + i * 0.08); gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.15);
           osc.start(now + i * 0.08); osc.stop(now + i * 0.08 + 0.15); }); }
         break;
+    }
+  } catch(e) {}
+}
+
+// 递进连击音效 - 连击越高越震撼
+function playComboSound(level) {
+  if (!soundEnabled || !audioCtx) return;
+  const now = audioCtx.currentTime;
+  try {
+    const baseFreq = 400 + level * 100;
+    // 基础音
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + 0.12);
+    gain.gain.setValueAtTime(0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    osc.start(now); osc.stop(now + 0.3);
+    // 高次泛音
+    if (level >= 3) {
+      const osc2 = audioCtx.createOscillator();
+      const gain2 = audioCtx.createGain();
+      osc2.connect(gain2); gain2.connect(audioCtx.destination);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(baseFreq * 2, now);
+      osc2.frequency.exponentialRampToValueAtTime(baseFreq * 3, now + 0.15);
+      gain2.gain.setValueAtTime(0.08, now);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      osc2.start(now); osc2.stop(now + 0.25);
+    }
+    // 超级连锁（5+）额外爆炸音
+    if (level >= 5) {
+      const osc3 = audioCtx.createOscillator();
+      const gain3 = audioCtx.createGain();
+      osc3.connect(gain3); gain3.connect(audioCtx.destination);
+      osc3.type = 'sawtooth';
+      osc3.frequency.setValueAtTime(150, now + 0.05);
+      osc3.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+      gain3.gain.setValueAtTime(0.15, now + 0.05);
+      gain3.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+      osc3.start(now + 0.05); osc3.stop(now + 0.4);
     }
   } catch(e) {}
 }
@@ -420,6 +482,8 @@ function loadLevel(lvl) {
   balls = [];
   particles = [];
   floatingTexts = [];
+  chainDepth = 0;
+  isChaining = false;
   isPaused = false;
   rescuePhase = 0;
   charState = 'trapped';
@@ -683,16 +747,19 @@ function update(dt) {
             // 连击特效
             if (comboMultiplier > 1) {
               addFloatingText(rock.x + rock.w/2, rock.y - 18, 'x' + comboMultiplier + ' 连击!');
-              if (comboCount % 3 === 0) { playSound('combo'); }
+              if (comboCount % 3 === 0) { playComboSound(comboMultiplier); }
             }
 
             spawnDestroyParticles(rock.x + rock.w/2, rock.y + rock.h/2, getRockColor(rock));
             addFloatingText(rock.x + rock.w/2, rock.y, '+' + points);
 
-          if (rock.special === 'bomb') { playSound('bomb'); explodeNearby(rock.x + rock.w/2, rock.y + rock.h/2); }
+          if (rock.special === 'bomb') { playSound('bomb'); explodeNearby(rock.x + rock.w/2, rock.y + rock.h/2, true); }
           else if (rock.special === 'time') { playSound('time'); pressure = Math.max(0, pressure - 20); addFloatingText(rock.x + rock.w/2, rock.y - 20, '⏰-20%'); }
           else if (rock.special === 'multi') { playSound('launch'); splitBall(ball); }
           else { playSound('destroy'); }
+
+          // 触发连锁坍塌系统
+          triggerChain(rock.x + rock.w/2, rock.y + rock.h/2, rock);
 
           rocks.splice(j, 1);
           updateUI();
@@ -789,7 +856,7 @@ function splitBall(orig) {
   }
 }
 
-function explodeNearby(x, y) {
+function explodeNearby(x, y, isChain) {
   const RADIUS = 70;
   let destroyed = 0;
   rocks.forEach(r => {
@@ -797,7 +864,10 @@ function explodeNearby(x, y) {
     if (dist < RADIUS) {
       r.hits -= 2;
       spawnDestroyParticles(r.x + r.w/2, r.y + r.h/2, '#FF5722');
-      if (r.hits <= 0) destroyed++;
+      if (r.hits <= 0) {
+        destroyed++;
+        triggerChain(r.x + r.w/2, r.y + r.h/2, r);
+      }
     }
   });
   rocks = rocks.filter(r => r.hits > 0);
@@ -806,6 +876,89 @@ function explodeNearby(x, y) {
     addFloatingText(x, y, `💣 x${destroyed}`);
   }
 }
+
+// ════════════════════════════════════════════════════════════
+//  连锁坍塌系统 V6.0
+// ════════════════════════════════════════════════════════════
+function triggerChain(x, y, destroyedRock) {
+  // 找出范围内所有石块，加入连锁队列
+  const toChain = [];
+  rocks.forEach(r => {
+    const dist = Math.hypot(r.x + r.w/2 - x, r.y + r.h/2 - y);
+    if (dist < CHAIN_RADIUS && dist > 5) {
+      toChain.push({ rock: r, dist: dist });
+    }
+  });
+
+  if (toChain.length > 0) {
+    chainDepth++;
+    screenShake = Math.max(screenShake, Math.min(chainDepth * 2, 8));
+
+    // 连锁提示
+    if (chainDepth >= 2) {
+      const el = document.getElementById('chain-display');
+      el.textContent = '连锁 x' + chainDepth;
+      el.classList.remove('show');
+      void el.offsetWidth;
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 600);
+    }
+
+    // 添加波纹特效
+    addChainWave(x, y, chainDepth);
+
+    // 按距离排序，延迟触发
+    toChain.sort((a, b) => a.dist - b.dist);
+    toChain.forEach((item, idx) => {
+      const delay = (idx + 1) * CHAIN_SPREAD_DELAY;
+      setTimeout(() => {
+        if (item.rock.hits > 0) {
+          item.rock.hits--;
+          item.rock.shake = 8;
+          spawnDestroyParticles(item.rock.x + item.rock.w/2, item.rock.y + item.rock.h/2, getRockColor(item.rock));
+          if (item.rock.hits <= 0) {
+            score += Math.floor(10 * comboMultiplier);
+            pressure = Math.max(0, pressure - pressureReductionPerRock);
+            addFloatingText(item.rock.x + item.rock.w/2, item.rock.y, '+' + Math.floor(10 * comboMultiplier));
+            triggerChain(item.rock.x + item.rock.w/2, item.rock.y + item.rock.h/2, item.rock);
+            rocks = rocks.filter(r => r !== item.rock);
+            updateUI();
+          }
+          updateUI();
+        }
+      }, delay);
+    });
+  }
+
+  // 连锁结束，播音效
+  if (toChain.length === 0 && chainDepth > 0) {
+    setTimeout(() => {
+      if (chainDepth >= 3) playChainEndSound(chainDepth);
+      chainDepth = 0;
+    }, CHAIN_SPREAD_DELAY * 2);
+  }
+}
+
+function addChainWave(x, y, depth) {
+  const wrap = document.getElementById('canvas-wrap');
+  const wave = document.createElement('div');
+  wave.className = 'chain-wave';
+  const size = 40 + depth * 10;
+  wave.style.width = size + 'px';
+  wave.style.height = size + 'px';
+  wave.style.left = (x - size/2) + 'px';
+  wave.style.top = (y - size/2) + 'px';
+  wave.style.borderColor = depth >= 3 ? '#FFD700' : depth >= 2 ? '#FF9800' : '#FF5722';
+  wave.style.animationDuration = (0.3 + depth * 0.05) + 's';
+  wrap.appendChild(wave);
+  setTimeout(() => wave.remove(), 500);
+}
+
+function playChainEndSound(depth) {
+  playComboSound(Math.min(depth, 8));
+}
+
+// ════════════════════════════════════════════════════════════
 
 function spawnHitParticles(x, y, color) {
   for (let i = 0; i < 5; i++) {
