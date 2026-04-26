@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>快乐消除 Happy Bricks - V6.0 连锁营救</title>
+<title>快乐消除 Happy Bricks - V7.0 变异营救</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;touch-action:none}
@@ -73,6 +73,24 @@ body{background:linear-gradient(180deg,#5D4037 0%,#4E342E 50%,#3E2723 100%);font
 /* 紧急状态动画 */
 @keyframes danger-pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,87,34,0.4)}50%{box-shadow:0 0 0 8px rgba(255,87,34,0)}}
 .danger-mode{animation:danger-pulse 1s infinite}
+
+/* 对白气泡 */
+#dialog-box{position:absolute;bottom:140px;left:10px;right:10px;display:flex;flex-direction:column;gap:8px;pointer-events:none;z-index:50}
+.dialog-bubble{max-width:85%;padding:10px 14px;border-radius:16px;font-size:0.85em;font-weight:700;animation:dialogIn 0.3s ease-out;box-shadow:0 4px 15px rgba(0,0,0,0.3)}
+.dialog-bubble.son{background:linear-gradient(135deg,#64B5F6,#42A5F5);color:#E3F2FD;align-self:flex-start;border-bottom-left-radius:4px}
+.dialog-bubble.father{background:linear-gradient(135deg,#FFCC80,#FF9800);color:#FFF3E0;align-self:flex-end;border-bottom-right-radius:4px}
+@keyframes dialogIn{from{transform:scale(0.8) translateY(10px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+
+/* 变异模式提示 */
+#mutation-banner{position:absolute;top:50px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#E91E63,#9C27B0);color:#FFF;padding:12px 24px;border-radius:20px;font-size:0.9em;font-weight:800;text-align:center;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:60;box-shadow:0 4px 20px rgba(156,39,176,0.5)}
+#mutation-banner.show{opacity:1;animation:bannerPulse 0.6s ease-out}
+@keyframes bannerPulse{0%{transform:translateX(-50%) scale(0.5)}50%{transform:translateX(-50%) scale(1.1)}100%{transform:translateX(-50%) scale(1)}}
+#mutation-banner .name{font-size:1.1em;margin-bottom:4px}
+#mutation-banner .desc{font-size:0.8em;opacity:0.9}
+
+/* 守护石光环 */
+.guardian-glow{position:absolute;border-radius:50%;pointer-events:none;animation:guardianPulse 2s infinite}
+@keyframes guardianPulse{0%,100%{opacity:0.3;transform:scale(1)}50%{opacity:0.6;transform:scale(1.15)}}
 </style>
 </head>
 <body>
@@ -96,9 +114,11 @@ body{background:linear-gradient(180deg,#5D4037 0%,#4E342E 50%,#3E2723 100%);font
     <canvas id="game-canvas"></canvas>
     <div id="chain-display"></div>
     <div id="launch-hint">👆 滑动瞄准，快速清除石块！</div>
+    <div id="dialog-box"></div>
+    <div id="mutation-banner"><div class="name"></div><div class="desc"></div></div>
   </div>
   <div id="overlay">
-    <div class="title">🪨 救援行动</div>
+    <div class="title">🪨 救援行动 V7.0</div>
     <div class="subtitle">石块从四面围困父子！<br>时间紧迫，<em>快速清除石块</em>让他们脱险！</div>
     <div class="card">
       <div class="card-title">🚨 紧急状况</div>
@@ -107,10 +127,11 @@ body{background:linear-gradient(180deg,#5D4037 0%,#4E342E 50%,#3E2723 100%);font
       <p>必须在<strong>压力满之前</strong>清除所有石块！</p>
     </div>
     <div class="card">
-      <div class="card-title">⚡ 玩法</div>
-      <p>👆 <b>滑动瞄准</b> — 360°全方位射击</p>
-      <p>🎯 <b>打碎石块</b> — 数字=需要击中次数</p>
-      <p>⏱️ <b>争分夺秒</b> — 压力条满则失败</p>
+      <div class="card-title">🌀 V7.0 新特性</div>
+      <p>🔥 <b>连锁坍塌</b> — 一次消除触发多级爆炸</p>
+      <p>🎲 <b>变异无尽</b> — 每5关规则突变，分数翻倍</p>
+      <p>🛡️ <b>守护石</b> — 护盾/时光/磁力三种守护</p>
+      <p>💬 <b>父子对白</b> — 动态剧情，情感共鸣</p>
     </div>
     <div class="card">
       <div class="card-title">💎 特殊道具</div>
@@ -119,14 +140,15 @@ body{background:linear-gradient(180deg,#5D4037 0%,#4E342E 50%,#3E2723 100%);font
       <p>✨ <b>分裂石</b> — 多球齐发</p>
       <p>⏰ <b>时间石</b> — 减少压力</p>
     </div>
-    <button class="btn" onclick="startGame()">▶ 开始救援</button>
+    <button class="btn" onclick="startGame()">▶ 剧情模式</button>
+    <button class="btn" style="background:linear-gradient(135deg,#E91E63,#9C27B0);margin-top:10px" onclick="startEndless()">♾ 无尽模式</button>
   </div>
 </div>
 
 <script>
 // ════════════════════════════════════════════════════════════
-//  快乐消除 Happy Bricks - V6.0 连锁坍塌系统
-//  物理连锁营救模式
+//  快乐消除 Happy Bricks - V7.0 变异无尽模式
+//  连锁坍塌 + 变异规则 + 守护石 + 父子对白
 // ════════════════════════════════════════════════════════════
 
 let canvas, ctx;
@@ -170,6 +192,63 @@ let chainWaves = []; // 连锁波纹特效
 
 let floatingTexts = [];
 let isPaused = false;
+
+// ════════════════════════════════════════════════════════════
+//  P1: 变异无尽模式 + 守护石 + 对白系统
+// ════════════════════════════════════════════════════════════
+// 变异模式配置
+const MUTATIONS = {
+  normal: { name: '正常模式', desc: '标准规则', ballSpeed: 1, pressureRate: 1, scoreMult: 1 },
+  gravity: { name: '重力翻转', desc: '石块从下方涌入', ballSpeed: 1, pressureRate: 1.2, scoreMult: 1.5 },
+  frozen: { name: '冰冻世界', desc: '球速减半', ballSpeed: 0.5, pressureRate: 0.8, scoreMult: 1.3 },
+  rage: { name: '狂暴时刻', desc: '压力加速', ballSpeed: 1.2, pressureRate: 1.8, scoreMult: 2 },
+  double: { name: '双倍狂欢', desc: '分数×2', ballSpeed: 1, pressureRate: 1, scoreMult: 2 },
+  dark: { name: '黑暗降临', desc: '视野受限', ballSpeed: 1, pressureRate: 1.3, scoreMult: 1.8 }
+};
+const MUTATION_ORDER = ['normal', 'gravity', 'frozen', 'rage', 'double', 'dark'];
+let currentMutation = 'normal';
+let endlessMode = false;
+let endlessLevel = 1;
+let mutationAnnounce = null; // 变异切换提示
+
+// 守护石系统
+let guardianStones = []; // 守护石列表
+const GUARDIAN_TYPES = {
+  shield: { name: '护盾守护', color: '#2196F3', effect: '抵消3次碰撞' },
+  time: { name: '时光守护', color: '#9C27B0', effect: '冻结压力10秒' },
+  magnet: { name: '磁力守护', color: '#F44336', effect: '吸引球10秒' }
+};
+
+// 父子对白系统
+let dialogQueue = [];
+let activeDialog = null;
+let dialogCooldown = 0;
+const DIALOGS = {
+  start: [
+    { speaker: 'son', text: '爸爸，我怕...', trigger: 'level_start' },
+    { speaker: 'father', text: '别怕，我一定能救你出去！', trigger: 'level_start' }
+  ],
+  chain2: [
+    { speaker: 'son', text: '哇！好厉害！', trigger: 'chain_2' },
+    { speaker: 'father', text: '看我的连锁爆破！', trigger: 'chain_2' }
+  ],
+  chain4: [
+    { speaker: 'son', text: '爸爸太强了！', trigger: 'chain_4' },
+    { speaker: 'father', text: '还没完呢！', trigger: 'chain_4' }
+  ],
+  danger: [
+    { speaker: 'son', text: '压力好大...', trigger: 'pressure_high' },
+    { speaker: 'father', text: '坚持住！', trigger: 'pressure_high' }
+  ],
+  rescue: [
+    { speaker: 'son', text: '我们自由了！', trigger: 'level_win' },
+    { speaker: 'father', text: '我就知道能行！', trigger: 'level_win' }
+  ],
+  mutation: [
+    { speaker: 'son', text: '世界变了...', trigger: 'mutation' },
+    { speaker: 'father', text: '不管怎样，我都要救你！', trigger: 'mutation' }
+  ]
+};
 
 // 压力系统
 let pressure = 0; // 0-100
@@ -348,6 +427,153 @@ function toggleSound() {
 }
 
 // ════════════════════════════════════════════════════════════
+//  P1: 对白系统
+// ════════════════════════════════════════════════════════════
+function triggerDialog(type) {
+  if (dialogCooldown > 0) return;
+  const dialogs = DIALOGS[type];
+  if (!dialogs) return;
+  
+  dialogs.forEach((d, i) => {
+    setTimeout(() => {
+      showDialogBubble(d.speaker, d.text);
+    }, i * 1800);
+  });
+  dialogCooldown = 5000; // 5秒冷却
+}
+
+function showDialogBubble(speaker, text) {
+  const box = document.getElementById('dialog-box');
+  const bubble = document.createElement('div');
+  bubble.className = `dialog-bubble ${speaker}`;
+  bubble.textContent = text;
+  box.appendChild(bubble);
+  
+  // 3秒后移除
+  setTimeout(() => {
+    bubble.style.opacity = '0';
+    bubble.style.transform = 'translateY(-10px)';
+    setTimeout(() => bubble.remove(), 300);
+  }, 2500);
+}
+
+// ════════════════════════════════════════════════════════════
+//  P1: 变异模式切换
+// ════════════════════════════════════════════════════════════
+function switchMutation(level) {
+  const idx = Math.floor((level - 1) / 5) % MUTATION_ORDER.length;
+  const newMutation = MUTATION_ORDER[idx];
+  
+  if (newMutation !== currentMutation) {
+    currentMutation = newMutation;
+    const mut = MUTATIONS[currentMutation];
+    
+    // 显示变异提示
+    const banner = document.getElementById('mutation-banner');
+    banner.querySelector('.name').textContent = '🌀 ' + mut.name;
+    banner.querySelector('.desc').textContent = mut.desc;
+    banner.classList.add('show');
+    setTimeout(() => banner.classList.remove('show'), 2500);
+    
+    // 触发对白
+    triggerDialog('mutation');
+    
+    playSound('launch');
+  }
+}
+
+function getMutationConfig() {
+  return MUTATIONS[currentMutation];
+}
+
+// ════════════════════════════════════════════════════════════
+//  P1: 守护石系统
+// ════════════════════════════════════════════════════════════
+function spawnGuardian(x, y) {
+  const types = Object.keys(GUARDIAN_TYPES);
+  const type = types[Math.floor(Math.random() * types.length)];
+  const guardian = {
+    x: x,
+    y: y,
+    type: type,
+    radius: 40,
+    active: true,
+    duration: type === 'shield' ? 3 : 10, // 盾牌按次数，其他按秒
+    pulsePhase: 0
+  };
+  guardianStones.push(guardian);
+}
+
+function updateGuardians(dt) {
+  guardianStones.forEach(g => {
+    if (!g.active) return;
+    g.pulsePhase += dt * 0.003;
+    
+    if (g.type !== 'shield') {
+      g.duration -= dt * 0.001;
+      if (g.duration <= 0) g.active = false;
+    }
+    
+    // 磁力守护效果
+    if (g.type === 'magnet' && g.active) {
+      balls.forEach(ball => {
+        const dist = Math.hypot(ball.x - g.x, ball.y - g.y);
+        if (dist < g.radius * 2 && dist > 5) {
+          const force = 0.5 * (1 - dist / (g.radius * 2));
+          ball.vx += (g.x - ball.x) / dist * force;
+          ball.vy += (g.y - ball.y) / dist * force;
+        }
+      });
+    }
+    
+    // 时光守护效果
+    if (g.type === 'time' && g.active) {
+      pressure = Math.max(0, pressure - 0.05);
+    }
+  });
+  
+  // 移除失效守护石
+  guardianStones = guardianStones.filter(g => g.active);
+}
+
+function drawGuardians(ctx) {
+  guardianStones.forEach(g => {
+    if (!g.active) return;
+    const type = GUARDIAN_TYPES[g.type];
+    const pulse = 1 + Math.sin(g.pulsePhase) * 0.15;
+    
+    // 光环
+    ctx.beginPath();
+    ctx.arc(g.x, g.y, g.radius * pulse, 0, Math.PI * 2);
+    ctx.strokeStyle = type.color + '60';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    
+    // 核心
+    ctx.beginPath();
+    ctx.arc(g.x, g.y, 12, 0, Math.PI * 2);
+    ctx.fillStyle = type.color;
+    ctx.fill();
+    ctx.strokeStyle = '#FFF';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    
+    // 剩余时间/次数显示
+    ctx.fillStyle = '#FFF';
+    ctx.font = 'bold 10px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(g.type === 'shield' ? '×' + g.duration : Math.ceil(g.duration) + 's', g.x, g.y + 4);
+  });
+}
+
+function hitGuardian(guardian) {
+  if (guardian.type === 'shield') {
+    guardian.duration--;
+    if (guardian.duration <= 0) guardian.active = false;
+  }
+}
+
+// ════════════════════════════════════════════════════════════
 //  关卡设计（产品经理设计）
 // ════════════════════════════════════════════════════════════
 const LEVEL_DESIGNS = [
@@ -377,7 +603,7 @@ const LEVEL_DESIGNS = [
     layout: [
       "#########",
       "#.##.##.#",
-      "#.#...#.#",
+      "#.#G..#.#",
       "#.......#",
       "#.@...@.#",
       "#.......#",
@@ -395,7 +621,7 @@ const LEVEL_DESIGNS = [
     pressureRate: 0.1,
     layout: [
       "###########",
-      "#.#.#.#.#.#",
+      "#.#.#G#.#.#",
       "#.........#",
       "#.#.#.#.#.#",
       "#.........#",
@@ -403,7 +629,7 @@ const LEVEL_DESIGNS = [
       "#.........#",
       "#.#.#.#.#.#",
       "#.........#",
-      "#.#.#.#.#.#",
+      "#.#.#G#.#.#",
       "###########"
     ],
     rockHits: { min: 2, max: 4 },
@@ -474,7 +700,26 @@ function startGame() {
   gameState = 'aiming';
   level = 1;
   score = 0;
+  endlessMode = false;
+  currentMutation = 'normal';
   loadLevel(level);
+  // 开局对白
+  setTimeout(() => triggerDialog('start'), 500);
+}
+
+function startEndless() {
+  initAudio();
+  document.getElementById('overlay').classList.add('hidden');
+  document.getElementById('pause-btn').style.display = 'block';
+  document.getElementById('sound-btn').style.display = 'block';
+  gameState = 'aiming';
+  endlessMode = true;
+  endlessLevel = 1;
+  level = 1;
+  score = 0;
+  currentMutation = 'normal';
+  loadLevel(level);
+  setTimeout(() => triggerDialog('start'), 500);
 }
 
 function loadLevel(lvl) {
@@ -482,17 +727,24 @@ function loadLevel(lvl) {
   balls = [];
   particles = [];
   floatingTexts = [];
+  guardianStones = [];
   chainDepth = 0;
   isChaining = false;
   isPaused = false;
   rescuePhase = 0;
   charState = 'trapped';
+  dialogCooldown = 0;
+  
+  // 无尽模式: 切换变异
+  if (endlessMode) {
+    switchMutation(endlessLevel);
+  }
 
   const design = lvl <= LEVEL_DESIGNS.length ? LEVEL_DESIGNS[lvl - 1] : null;
 
   if (design) {
     timeRemaining = design.time;
-    pressureRate = design.pressureRate;
+    pressureRate = design.pressureRate * getMutationConfig().pressureRate;
     maxPressure = 100;
     pressure = 0;
     ballsRemaining = 10 + Math.floor(lvl / 2);
@@ -523,6 +775,12 @@ function loadLevel(lvl) {
             special,
             shake: 0
           });
+        } else if (char === 'G') {
+          // 守护石位置
+          spawnGuardian(
+            offsetX + col * (ROCK_SIZE + ROCK_PADDING) + ROCK_SIZE/2,
+            offsetY + row * (ROCK_SIZE + ROCK_PADDING) + ROCK_SIZE/2
+          );
         }
       }
     }
@@ -577,7 +835,16 @@ function updateUI() {
   document.getElementById('time-val').textContent = Math.ceil(timeRemaining);
   const comboEl = document.getElementById('combo-display');
   if (comboMultiplier > 1) { comboEl.style.display = ''; document.getElementById('combo-val').textContent = 'x'+comboMultiplier; comboEl.style.background = comboMultiplier >= 5 ? 'rgba(255,215,0,0.3)' : 'rgba(255,255,255,0.1)'; } else { comboEl.style.display = 'none'; }
-  document.getElementById('level-display').textContent = `第 ${level} 关`;
+  
+  // 关卡显示：无尽模式显示关数+变异
+  const levelDisplay = document.getElementById('level-display');
+  if (endlessMode) {
+    levelDisplay.textContent = `∞ ${endlessLevel} · ${MUTATIONS[currentMutation].name}`;
+    levelDisplay.style.background = 'linear-gradient(135deg,#E91E63,#9C27B0)';
+  } else {
+    levelDisplay.textContent = `第 ${level} 关`;
+    levelDisplay.style.background = 'linear-gradient(135deg,#FF6F00,#E65100)';
+  }
 
   const pressurePercent = Math.min(100, (pressure / maxPressure) * 100);
   document.getElementById('pressure-fill').style.width = pressurePercent + '%';
@@ -644,6 +911,12 @@ function launchBall() {
 // ════════════════════════════════════════════════════════════
 function update(dt) {
   if (gameState === 'idle' || gameState === 'win' || gameState === 'lose' || isPaused) return;
+  
+  // 对白冷却
+  if (dialogCooldown > 0) dialogCooldown -= dt * 0.001;
+  
+  // 守护石更新
+  updateGuardians(dt);
 
   charAnimTime += dt;
   if (Math.random() < 0.003) fatherBlink = 8;
@@ -662,9 +935,13 @@ function update(dt) {
       showResult(false);
       return;
     }
-    // 危险音效
-    if (pressure > maxPressure * 0.85 && Math.random() < 0.02) {
-      playSound('danger');
+    // 危险音效和对白
+    if (pressure > maxPressure * 0.85) {
+      if (Math.random() < 0.02) playSound('danger');
+      // 第一次进入危险区触发对白
+      if (pressure > maxPressure * 0.85 && pressure < maxPressure * 0.87) {
+        triggerDialog('danger');
+      }
     }
   }
 
@@ -894,6 +1171,10 @@ function triggerChain(x, y, destroyedRock) {
     chainDepth++;
     screenShake = Math.max(screenShake, Math.min(chainDepth * 2, 8));
 
+    // 连锁对白触发
+    if (chainDepth === 2) triggerDialog('chain2');
+    if (chainDepth >= 4) triggerDialog('chain4');
+
     // 连锁提示
     if (chainDepth >= 2) {
       const el = document.getElementById('chain-display');
@@ -990,20 +1271,32 @@ function showResult(win) {
   document.getElementById('pause-btn').style.display = 'none';
   const overlay = document.getElementById('overlay');
   overlay.classList.remove('hidden');
+  
+  // 营救成功对白
+  if (win) triggerDialog('rescue');
+  
+  const mutationLabel = endlessMode ? `<div class="result-stat"><div class="result-stat-value" style="color:#E91E63">${MUTATIONS[currentMutation].name}</div><div class="result-stat-label">变异模式</div></div>` : '';
+  
   overlay.innerHTML = `
     <div class="result-title ${win ? 'win' : 'lose'}">${win ? '🎉 营救成功！' : '💔 营救失败'}</div>
     <div class="result-stats">
       <div class="result-stat"><div class="result-stat-value">${score}</div><div class="result-stat-label">分数</div></div>
-      <div class="result-stat"><div class="result-stat-value">${level}</div><div class="result-stat-label">关卡</div></div>
+      <div class="result-stat"><div class="result-stat-value">${endlessMode ? endlessLevel : level}</div><div class="result-stat-label">${endlessMode ? '无尽关数' : '关卡'}</div></div>
       <div class="result-stat"><div class="result-stat-value">${Math.ceil(timeRemaining)}</div><div class="result-stat-label">剩余时间</div></div>
+      ${mutationLabel}
     </div>
-    <button class="btn" onclick="${win ? 'nextLevel()' : 'retryLevel()'}">${win ? '▶ 下一关' : '🔄 重试'}</button>
+    <button class="btn" onclick="${win ? 'nextLevel()' : 'retryLevel()'}">${win ? (endlessMode ? '▶ 下一关' : '▶ 下一关') : '🔄 重试'}</button>
   `;
 }
 
 function nextLevel() {
-  level++;
-  loadLevel(level);
+  if (endlessMode) {
+    endlessLevel++;
+    loadLevel(endlessLevel);
+  } else {
+    level++;
+    loadLevel(level);
+  }
   document.getElementById('overlay').classList.add('hidden');
   document.getElementById('pause-btn').style.display = 'block';
 }
@@ -1043,6 +1336,9 @@ function draw() {
 
   // 石块
   rocks.forEach(drawRock);
+  
+  // 守护石
+  drawGuardians(ctx);
 
   // 发射器
   drawLauncher();
