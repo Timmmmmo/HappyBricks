@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>快乐消除 Happy Bricks - V7.1 精准发射</title>
+<title>快乐消除 Happy Bricks - V8.0 AI素材版</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;touch-action:none}
@@ -153,6 +153,28 @@ body{background:linear-gradient(180deg,#5D4037 0%,#4E342E 50%,#3E2723 100%);font
 
 let canvas, ctx;
 let W, H;
+
+// ══════════════════════════════════════
+//  图片素材加载 (AI生成)
+// ══════════════════════════════════════
+const assets = {
+  father: null,
+  son: null,
+  stone: null
+};
+const ASSET_PATH = 'assets/';
+let assetsLoaded = 0;
+const TOTAL_ASSETS = 3;
+
+function loadAssets() {
+  const names = ['father', 'son', 'stone'];
+  names.forEach(name => {
+    const img = new Image();
+    img.onload = () => { assets[name] = img; assetsLoaded++; };
+    img.onerror = () => { assetsLoaded++; console.warn(`Failed to load: ${name}`); };
+    img.src = `${ASSET_PATH}${name}.png`;
+  });
+}
 
 // 游戏状态
 let gameState = 'idle';
@@ -675,6 +697,9 @@ function init() {
   ctx = canvas.getContext('2d');
   resize();
   window.addEventListener('resize', resize);
+
+  // 加载AI生成的图片素材
+  loadAssets();
 
   canvas.addEventListener('pointerdown', onPointerDown, { passive: false });
   canvas.addEventListener('pointermove', onPointerMove, { passive: false });
@@ -1400,9 +1425,9 @@ function drawCharacters() {
   ctx.fill();
 
   // 父亲
-  drawQCharacter(x - 25, y, 28, '#FFCC80', '#E65100', fatherBlink > 0, charState === 'trapped', charState === 'danger', charState === 'rescued');
+  drawQCharacter(x - 25, y, 28, '#FFCC80', '#E65100', fatherBlink > 0, charState === 'trapped', charState === 'danger', charState === 'rescued', 'father');
   // 儿子
-  drawQCharacter(x + 20, y + 5, 22, '#FFE0B2', '#FB8C00', sonBlink > 0, charState === 'trapped', charState === 'danger', charState === 'rescued');
+  drawQCharacter(x + 20, y + 5, 22, '#FFE0B2', '#FB8C00', sonBlink > 0, charState === 'trapped', charState === 'danger', charState === 'rescued', 'son');
 
   // 获救光芒
   if (charState === 'rescued') {
@@ -1416,7 +1441,21 @@ function drawCharacters() {
   }
 }
 
-function drawQCharacter(x, y, size, skinColor, hairColor, isBlinking, isWorried, isDanger, isHappy) {
+function drawQCharacter(x, y, size, skinColor, hairColor, isBlinking, isWorried, isDanger, isHappy, imgAsset) {
+  // 如果图片素材已加载，使用图片绘制
+  if (imgAsset && assets[imgAsset]) {
+    const imgSize = size * 1.3;  // 缩小尺寸到1.3
+    // 使用圆形裁剪移除白色背景
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y - size*0.1, imgSize/2, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.drawImage(assets[imgAsset], x - imgSize/2, y - imgSize/2 - size*0.1, imgSize, imgSize);
+    ctx.restore();
+    return;
+  }
+
+  // fallback: 原始Canvas几何绘制（图片未加载时）
   // 身体
   ctx.fillStyle = hairColor;
   ctx.beginPath();
@@ -1524,6 +1563,29 @@ function drawRock(rock) {
   const w = rock.w;
   const h = rock.h;
   const color = getRockColor(rock);
+
+  // 如果石块素材已加载，使用图片绘制
+  if (assets.stone) {
+    ctx.drawImage(assets.stone, x, y, w, h);
+    // 特殊标记
+    if (rock.special) {
+      const icon = { gold: '⭐', bomb: '💣', time: '⏰', multi: '✨' }[rock.special];
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(icon, x + w/2, y + h/2 - 2);
+    }
+    // 数字
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.font = `bold ${Math.min(14, h * 0.4)}px sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowBlur = 2; ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.fillText(rock.hits, x + w/2, y + h/2 + (rock.special ? 8 : 0));
+    ctx.shadowBlur = 0;
+    return;
+  }
+
+  // fallback: 原始Canvas绘制（图片未加载时）
 
   // 阴影
   ctx.fillStyle = 'rgba(0,0,0,0.4)';
